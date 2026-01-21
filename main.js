@@ -1,51 +1,54 @@
-const apiKey = "AIzaSyCQpPfsdK4hNuaxoGlnksQ5OVLeNQrw070"; 
-const cx = "41edee7ed7f364d38"; 
+const apiKey = "AIzaSyCQpPfsdK4hNuaxoGlnksQ5OVLeNQrw070"; // حط مفتاح API الصح
+const cx = "41edee7ed7f364d38"; // حط cx من Google CSE
 const inp = document.getElementById("inp");
 const images = document.querySelector(".images");
 
-let startIndex = 1; 
+let startIndex = 1;
 
 const getImage = async () => {
   const query = inp.value.trim();
   if (!query) return;
 
   try {
-    const res = await fetch(`https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&cx=${cx}&key=${apiKey}&searchType=image&num=3&start=${startIndex}`);
+    const res = await fetch(
+      `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&cx=${cx}&key=${apiKey}&searchType=image&num=3&start=${startIndex}`
+    );
     const data = await res.json();
 
     images.innerHTML = "";
 
-    if (!data.items) {
+    if (!data.items || data.items.length === 0) {
       console.error("No items found");
       return;
     }
 
-    
     const seenLinks = new Set();
     const uniqueItems = [];
 
     for (const item of data.items) {
-      if(item.link && !seenLinks.has(item.link)){
+      if (item.link && !seenLinks.has(item.link)) {
         seenLinks.add(item.link);
         uniqueItems.push(item);
       }
-      if(uniqueItems.length >= 3) break; 
+      if (uniqueItems.length >= 3) break;
     }
 
-    uniqueItems.forEach(item => {
+    uniqueItems.forEach((item) => {
       const container = document.createElement("div");
+      container.style.margin = "5px"; // تحسين بسيط للمسافة
 
-     
-      if(item.link.match(/\.(mp4|webm|ogg)$/i)) {
+      if (item.link.match(/\.(mp4|webm|ogg)$/i)) {
         const video = document.createElement("video");
         video.src = item.link;
         video.controls = true;
         video.width = 200;
         video.height = 200;
         container.append(video);
-      } else { 
+      } else {
         const img = document.createElement("img");
         img.src = item.link;
+        img.width = 200; // حجم الصور موحد
+        img.height = 200;
         container.append(img);
       }
 
@@ -53,17 +56,8 @@ const getImage = async () => {
     });
 
     startIndex += 3;
-    if(startIndex > 90) startIndex = 1;
-
+    if (startIndex > 90) startIndex = 1;
   } catch (err) {
     console.error(err.message);
   }
 };
- startIndex += 3;
-    if(startIndex > 90) startIndex = 1; 
-
-  } catch (err) {
-    console.error(err.message);
-  }
-};
-
